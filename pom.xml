@@ -16,7 +16,7 @@
 
     <modules>
         <module>config-server</module>
-        <module>clients-service</module>
+        <module>client-service</module>
     </modules>
 
     <properties>
