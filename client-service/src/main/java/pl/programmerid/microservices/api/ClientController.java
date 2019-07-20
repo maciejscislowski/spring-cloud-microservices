@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,10 +29,19 @@ public class ClientController {
         return property + " " + configClient.getConfig();
     }
 
-    @FeignClient("config-server")
+    @FeignClient(name = "config-server", fallback = ConfigServerFallback.class)
     interface ConfigClient {
-        @RequestMapping(value = "/client-service/master", method = GET)
+        @RequestMapping(value = "/client-service/master", method = GET, consumes = MediaType.APPLICATION_JSON_VALUE)
         String getConfig();
+    }
+
+    @Component
+    class ConfigServerFallback implements ConfigClient {
+
+        @Override
+        public String getConfig() {
+            return "UNAVAILABLE";
+        }
     }
 
 }
